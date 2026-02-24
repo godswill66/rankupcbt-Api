@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+
 const cors = require("cors");
 dotenv.config();
 
@@ -10,6 +11,9 @@ const connectDB = require('./config/db');
 
 // Import the authentication middleware (renamed file/variable)
 const authMiddleware = require("./middleware/authMiddleware.js"); 
+
+// importing userRoutes
+const userRoutes = require("./routes/userRoutes");
 
 app.use(
   cors({
@@ -28,11 +32,14 @@ app.get("/", (req, res) => {
   res.send("RankUp CBT API Running 🚀");
 });
 
+
 const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/questions", require("./routes/questionRoutes"));
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/users", userRoutes);
 
 const PORT = process.env.PORT || 3000;
 
