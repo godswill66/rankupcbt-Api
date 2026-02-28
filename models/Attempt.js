@@ -7,22 +7,20 @@ const attemptSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    subject: {
-      type: String,
-      required: true,
-    },
-    score: {
-      type: Number,
-      required: true,
-    },
-    totalQuestions: {
-      type: Number,
-      required: true,
-    },
-    duration: {
-      type: Number, // in minutes
-      required: true,
-    },
+    subject: String,
+    answers: [
+      {
+        question: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Question",
+        },
+        selected: String,
+        correct: Boolean,
+      },
+    ],
+    score: Number,
+    totalQuestions: Number,
+    duration: Number,
   },
   { timestamps: true }
 );

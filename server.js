@@ -1,49 +1,37 @@
 const express = require("express");
 const dotenv = require("dotenv");
-
 const cors = require("cors");
+const connectDB = require("./config/db");
+
 dotenv.config();
 
 const app = express();
 
-// Import the centralized DB connection function
-const connectDB = require('./config/db'); 
+// Connect Database
+connectDB(process.env.MONGO_URI);
 
-// Import the authentication middleware (renamed file/variable)
-const authMiddleware = require("./middleware/authMiddleware.js"); 
+// Middleware
+app.use(cors({
+  origin: "http://127.0.0.1:5501",
+  credentials: true,
+}));
 
-// importing userRoutes
-const userRoutes = require("./routes/userRoutes");
-
-app.use(
-  cors({
-    origin: "http://127.0.0.1:5501", // My frontend URL
-    credentials: true,
-  })
-);
-
-// Parse incoming JSON payloads from request bodies (e.g., POST/PUT requests)
 app.use(express.json());
 
-console.log("Mongo URI being used:", process.env.MONGO_URI);
-connectDB(process.env.MONGO_URI); // Use the dedicated connection function
-
+// Routes
 app.get("/", (req, res) => {
   res.send("RankUp CBT API Running 🚀");
 });
 
-
-const authRoutes = require("./routes/authRoutes");
-
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/questions", require("./routes/questionRoutes"));
-
-app.use("/api/auth", authRoutes);
-
-app.use("/api/users", userRoutes);
-
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
-const PORT = process.env.PORT || 3000;
+app.use("/api/practice", require("./routes/practiceRoutes"));
+app.use("/api/ranking", require("./routes/rankingRoutes"));
 
+// Server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

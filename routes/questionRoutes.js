@@ -4,6 +4,11 @@ const { protect, adminOnly } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+/*
+   =============================
+   ADMIN ROUTES
+   =============================
+*/
 
 // ADD QUESTION (Admin Only)
 router.post("/", protect, adminOnly, async (req, res) => {
@@ -15,6 +20,7 @@ router.post("/", protect, adminOnly, async (req, res) => {
       questionText,
       options,
       correctAnswer,
+      createdBy: req.user.id, // Optional: track admin
     });
 
     res.status(201).json(question);
@@ -23,8 +29,13 @@ router.post("/", protect, adminOnly, async (req, res) => {
   }
 });
 
+/*
+   =============================
+   USER ROUTES
+   =============================
+*/
 
-// GET QUESTIONS BY SUBJECT
+// GET QUESTIONS BY SUBJECT (Logged in users only)
 router.get("/:subject", protect, async (req, res) => {
   try {
     const questions = await Question.find({

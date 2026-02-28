@@ -6,16 +6,18 @@ const questionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    questionText: {
+    text: {
       type: String,
       required: true,
     },
-    options: {
-      type: [String],
-      required: true,
-    },
+    options: [
+      {
+        label: String, // A, B, C, D
+        text: String,
+      },
+    ],
     correctAnswer: {
-      type: String,
+      type: String, // A, B, C, D
       required: true,
     },
   },

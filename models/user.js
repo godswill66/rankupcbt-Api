@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
   location: {
     type: String,
   },
+  role: {
+  type: String,
+  enum: ["user", "admin"],
+  default: "user",
+}
 });
 
 // 🔥 Prevent OverwriteModelError
