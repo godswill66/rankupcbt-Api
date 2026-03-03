@@ -29,6 +29,7 @@ app.use("/api/questions", require("./routes/questionRoutes"));
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 app.use("/api/practice", require("./routes/practiceRoutes"));
 app.use("/api/ranking", require("./routes/rankingRoutes"));
+app.use("/api/answers", require("./routes/answerRoutes"));
 
 // Server
 const PORT = process.env.PORT || 3000;

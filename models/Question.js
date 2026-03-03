@@ -21,7 +21,7 @@ const questionSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+    { _id: true }
 );
 
 module.exports = mongoose.model("Question", questionSchema);
