@@ -12,8 +12,8 @@ connectDB(process.env.MONGO_URI);
 
 // Middleware
 app.use(cors({
-  origin: "http://127.0.0.1:5501",
   credentials: true,
+  origin: process.env.FRONTEND_URL,
 }));
 
 app.use(express.json());
