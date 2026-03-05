@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
+const profileRoutes = require("./routes/profileRoutes");
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 app.use("/api/practice", require("./routes/practiceRoutes"));
 app.use("/api/ranking", require("./routes/rankingRoutes"));
 app.use("/api/answers", require("./routes/answerRoutes"));
+app.use("/api/users", profileRoutes);
 
 // Server
 const PORT = process.env.PORT || 3000;

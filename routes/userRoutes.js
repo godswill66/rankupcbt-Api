@@ -9,23 +9,23 @@ router.get("/me", protect, async (req, res) => {
 });
 
 // UPDATE profile
-router.put("/me", protect, async (req, res) => {
-  const { fullName, phone, location } = req.body;
+router.put("/profile", protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
 
-  const user = await User.findById(req.user._id).select("-password -__v");
+    user.name = req.body.name || user.name;
+    user.email = req.body.email || user.email;
+    user.phone = req.body.phone || user.phone;
+    user.location = req.body.location || user.location;
+    user.bio = req.body.bio || user.bio;
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  } 
+    const updatedUser = await user.save();
 
+    res.json(updatedUser);
 
-  user.fullName = fullName || user.fullName;
-  user.phone = phone || user.phone;
-  user.location = location || user.location;
-
-  const updatedUser = await user.save();
-
-  res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 module.exports = router;

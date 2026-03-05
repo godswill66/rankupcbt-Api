@@ -1,31 +1,52 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+
   fullName: {
     type: String,
-    required: true,
+    required: true
   },
+
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
+
   password: {
     type: String,
-    required: true,
+    required: true
   },
+
   phone: {
-    type: String,
+    type: String
   },
+
   location: {
-    type: String,
+    type: String
   },
+
+  institution: {
+    type: String
+  },
+
+  bio: {
+    type: String
+  },
+
+  avatar: {
+    type: String,
+    default: "/assets/default-avatar.png"
+  },
+
   role: {
-  type: String,
-  enum: ["user", "admin"],
-  default: "user",
-}
-});
+    type: String,
+    enum: ["user", "admin"],
+    default: "user"
+  }
+
+}, { timestamps: true });
+
 
 // 🔥 Prevent OverwriteModelError
 module.exports = mongoose.models.User || mongoose.model("User", userSchema);
