@@ -1,7 +1,7 @@
 // Import the jsonwebtoken library for verifying the token signature
 const jwt = require("jsonwebtoken");
 // Import the User model to fetch user details from the database
-const User = require("../models/User");
+const User = require("../models/user");
 
 // Protect Routeq
 const protect = async (req, res, next) => {

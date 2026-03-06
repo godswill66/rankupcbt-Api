@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Attempt = require("../models/Attempt");
-const User = require("../models/User");
+const User = require("../models/user");
 const protect = require("../middleware/authMiddleware").protect;
 
 /**
