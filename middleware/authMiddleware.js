@@ -1,15 +1,16 @@
 // Import the jsonwebtoken library for verifying the token signature
 const jwt = require("jsonwebtoken");
 // Import the User model to fetch user details from the database
-const User = require("../models/user");
+const User = require("../models/User");
 
 // Protect Routeq
 const protect = async (req, res, next) => {
   let token;
 
-  if (req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")) {
-
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
     try {
       token = req.headers.authorization.split(" ")[1];
 
@@ -27,7 +28,6 @@ const protect = async (req, res, next) => {
     return res.status(401).json({ message: "No token" });
   }
 };
-
 
 // Admin Only
 const adminOnly = (req, res, next) => {

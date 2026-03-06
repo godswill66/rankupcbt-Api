@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
+const User = require("../models/User");
 
 const router = express.Router();
 
@@ -24,11 +24,9 @@ router.post("/register", async (req, res) => {
     });
 
     // 🔥 Generate token immediately after registration
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.status(201).json({
       token,
@@ -38,7 +36,6 @@ router.post("/register", async (req, res) => {
         email: user.email,
       },
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,11 +56,9 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { id: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     res.json({
       token,
@@ -73,7 +68,6 @@ router.post("/login", async (req, res) => {
         email: user.email,
       },
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
