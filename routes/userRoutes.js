@@ -13,7 +13,7 @@ router.put("/profile", protect, async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 
-    user.name = req.body.name || user.name;
+    user.fullName = req.body.fullName || user.fullName;
     user.email = req.body.email || user.email;
     user.phone = req.body.phone || user.phone;
     user.location = req.body.location || user.location;
