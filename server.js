@@ -16,6 +16,13 @@ app.use(cors({
   origin: process.env.FRONTEND_URL,
 }));
 
+// Catch-all route for 404
+app.use((req, res) => {
+    // If you're serving the HTML from a file:
+    res.status(404).sendFile(path.join(__dirname, '404/404.html'));
+});
+
+
 app.use(express.json());
 
 // Import Routes
@@ -29,6 +36,7 @@ const examRoutes = require("./routes/exam");
 app.get("/", (req, res) => {
   res.send("RankUp CBT API Running 🚀");
 });
+
 
 // User Routes
 app.use("/api/auth", require("./routes/authRoutes"));
@@ -47,6 +55,10 @@ app.use("/api/exam", examRoutes);
 app.use("/api/admin", adminQuestions);
 app.use("/api/admin", adminUpload);
 app.use("/api/admin", adminStats);
+
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '404/404.html'));
+});
 
 // Server
 const PORT = process.env.PORT || 3000;
