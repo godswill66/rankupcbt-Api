@@ -1,39 +1,29 @@
 const mongoose = require("mongoose");
 
+const optionSchema = new mongoose.Schema({
+  label: String,
+  text: String
+});
+
 const questionSchema = new mongoose.Schema({
   subject: {
     type: String,
     required: true,
+    enum: ["bio", "eng", "math", "phy", "chem"]
   },
 
-  question: {
+  questionText: {
     type: String,
-    required: true,
+    required: true
   },
 
-  options: {
-    A: String,
-    B: String,
-    C: String,
-    D: String,
-  },
+  options: [optionSchema],
 
   correctAnswer: {
     type: String,
-    enum: ["A", "B", "C", "D"],
-    required: true,
-  },
+    required: true
+  }
 
-  explanation: {
-    type: String,
-  },
+}, { timestamps: true });
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
-module.exports =
-  mongoose.models.Question ||
-  mongoose.model("Question", questionSchema);
+module.exports = mongoose.model("Question", questionSchema);

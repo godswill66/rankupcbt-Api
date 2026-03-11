@@ -1,51 +1,17 @@
 const express = require("express");
-const Question = require("../models/Question");
-const { protect, adminOnly } = require("../middleware/authMiddleware");
-
 const router = express.Router();
+const Question = require("../models/Question");
 
-/*
-   =============================
-   ADMIN ROUTES
-   =============================
-*/
+// GET QUESTIONS BY SUBJECT
 
-// ADD QUESTION (Admin Only)
-router.post("/", protect, adminOnly, async (req, res) => {
-  try {
-    const { subject, questionText, options, correctAnswer } = req.body;
+router.get("/:subject", async (req, res) => {
 
-    const question = await Question.create({
-      subject,
-      questionText,
-      options,
-      correctAnswer,
-      createdBy: req.user.id, // Optional: track admin
-    });
+  const subject = req.params.subject;
 
-    res.status(201).json(question);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+  const questions = await Question.find({ subject }).limit(40);
 
-/*
-   =============================
-   USER ROUTES
-   =============================
-*/
+  res.json(questions);
 
-// GET QUESTIONS BY SUBJECT (Logged in users only)
-router.get("/:subject", protect, async (req, res) => {
-  try {
-    const questions = await Question.find({
-      subject: req.params.subject,
-    });
-
-    res.json(questions);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
 });
 
 module.exports = router;

@@ -1,23 +1,30 @@
 const express = require("express");
 const router = express.Router();
-
 const Question = require("../models/Question");
-const User = require("../models/user");
 
-router.get("/dashboard-stats", async (req, res) => {
-  try {
-    const totalQuestions = await Question.countDocuments();
-    const totalUsers = await User.countDocuments();
-    const totalAdmins = await User.countDocuments({ role: "admin" });
+router.post("/submit", async (req, res) => {
 
-    res.json({
-      totalQuestions,
-      totalUsers,
-      totalAdmins,
-    });
-  } catch (err) {
-    res.status(500).json({ message: "Error loading stats" });
-  }
+  const { userAnswers, subject } = req.body;
+
+  const questions = await Question.find({ subject });
+
+  let score = 0;
+
+  userAnswers.forEach(ans => {
+
+    const question = questions.find(q => q._id.toString() === ans.qId);
+
+    if (question && question.correctAnswer === ans.choice) {
+      score++;
+    }
+
+  });
+
+  res.json({
+    score,
+    total: questions.length
+  });
+
 });
 
 module.exports = router;

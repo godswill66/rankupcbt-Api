@@ -1,5 +1,5 @@
 const express = require("express");
-const path = require("path"); // 1. ADDED: You need this to use path.join
+const path = require("path"); 
 const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
