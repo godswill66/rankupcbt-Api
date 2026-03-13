@@ -1,11 +1,24 @@
 const express = require("express");
 const router = express.Router();
 const Question = require("../models/Question");
+const adminMiddleware = require("../middleware/adminMiddleware");
 
-// ADD QUESTION
-router.post("/questions", async (req, res) => {
+// 1. GET ALL QUESTIONS (Used by Dashboard Table)
+// URL: GET http://localhost:3001/api/admin
+router.get("/", adminMiddleware, async (req, res) => {
   try {
+    const questions = await Question.find().sort({ createdAt: -1 });
+    res.json(questions);
+  } catch (err) {
+    console.error("Fetch Error:", err);
+    res.status(500).json({ message: "Error fetching questions" });
+  }
+});
 
+// 2. ADD NEW QUESTION
+// URL: POST http://localhost:3001/api/admin
+router.post("/", adminMiddleware, async (req, res) => {
+  try {
     const { subject, questionText, options, correctAnswer } = req.body;
 
     const question = new Question({
@@ -21,29 +34,25 @@ router.post("/questions", async (req, res) => {
       message: "Question added successfully",
       question
     });
-
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Save Error:", err);
+    res.status(400).json({ message: "Error saving question" });
   }
 });
 
-// GET ALL QUESTIONS (ADMIN TABLE)
-router.get("/questions", async (req, res) => {
-
-  const questions = await Question.find().sort({ createdAt: -1 });
-
-  res.json(questions);
-
-});
-
-// DELETE QUESTION
-router.delete("/questions/:id", async (req, res) => {
-
-  await Question.findByIdAndDelete(req.params.id);
-
-  res.json({ message: "Deleted successfully" });
-
+// 3. DELETE QUESTION
+// URL: DELETE http://localhost:3001/api/admin/:id
+router.delete("/:id", adminMiddleware, async (req, res) => {
+  try {
+    const deletedQuestion = await Question.findByIdAndDelete(req.params.id);
+    if (!deletedQuestion) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+    res.json({ message: "Deleted successfully" });
+  } catch (err) {
+    console.error("Delete Error:", err);
+    res.status(500).json({ message: "Server error during deletion" });
+  }
 });
 
 module.exports = router;
