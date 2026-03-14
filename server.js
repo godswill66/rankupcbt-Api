@@ -55,7 +55,7 @@ app.use("/api/admin", adminStats);
 // 5. CATCH-ALL 404 (MUST BE THE VERY LAST ONE)
 app.use((req, res) => {
   // This points to your 404 folder and the 404.html file
-  res.status(404).sendFile(path.join(__dirname, "404", "404.html"));
+  res.status(404).sendFile(path.join(__dirname, "./404", "404.html"));
 });
 
 // Server
