@@ -7,47 +7,52 @@ const { protect } = require("../middleware/authMiddleware");
 // SUBMIT EXAM ANSWERS
 router.post("/submit", protect, async (req, res) => {
   try {
-    const { subject, userAnswers } = req.body; // userAnswers = [{ qId: "...", choice: "A" }]
+    const { subject, userAnswers } = req.body; 
     
-    // 1. Fetch all questions for this subject to verify answers server-side
+    // 1. Fetch questions
     const questions = await Question.find({ subject });
     
-    let totalScore = 0;
-    const processedAnswers = [];
+    let score = 0;
 
-    // 2. Compare user answers with the database
-    userAnswers.forEach((userAns) => {
-      const question = questions.find((q) => q._id.toString() === userAns.qId);
-      
-      if (question) {
-        const isCorrect = question.correctAnswer === userAns.choice;
-        if (isCorrect) totalScore += 1;
+    // 2. Process answers
+    const processedAnswers = userAnswers.map((ans) => {
+      const question = questions.find((q) => q._id.toString() === ans.qId);
+      const isCorrect = question && question.correctAnswer === ans.choice;
 
-        processedAnswers.push({
-          questionId: userAns.qId,
-          selectedOption: userAns.choice,
-          isCorrect: isCorrect,
-        });
-      }
+      if (isCorrect) score++;
+
+      return {
+        questionId: ans.qId,
+        selectedOption: ans.choice,
+        isCorrect: !!isCorrect, // ensures a boolean
+      };
     });
 
-    // 3. Save the result to the database
-    const newResult = await Result.create({
-      user: req.user.id,
+    const totalQuestions = questions.length;
+    const percentage = totalQuestions > 0 ? (score / totalQuestions) * 100 : 0;
+
+    // 3. Save result
+    const newResult = new Result({
+      user: req.user._id, // Use _id from protect middleware
       subject,
       answers: processedAnswers,
-      score: totalScore,
-      totalQuestions: questions.length,
+      score,
+      totalQuestions,
+      percentage: percentage.toFixed(2),
     });
+
+    await newResult.save();
 
     res.status(201).json({
       message: "Exam submitted successfully",
-      score: totalScore,
-      total: questions.length,
+      score,
+      total: totalQuestions,
+      percentage: percentage.toFixed(2),
       resultId: newResult._id
     });
 
   } catch (error) {
+    console.error("Submission Error:", error);
     res.status(500).json({ message: error.message });
   }
 });

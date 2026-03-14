@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const protect = require("../middleware/authMiddleware").protect;
+const { protect } = require("../middleware/authMiddleware");
 
 const Attempt = require("../models/Attempt");
 const Notification = require("../models/Notification");
@@ -10,15 +10,12 @@ router.get("/", protect, async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Get all attempts for the user
+    // 1. Get all attempts for subject analytics
     const attempts = await Attempt.find({ user: userId });
-
     const totalPractices = attempts.length;
 
     let totalScore = 0;
     let totalQuestions = 0;
-
-    // Subject analytics map
     const subjectMap = {};
 
     attempts.forEach((attempt) => {
@@ -30,48 +27,42 @@ router.get("/", protect, async (req, res) => {
       if (!subjectMap[attempt.subject]) {
         subjectMap[attempt.subject] = [];
       }
-
       subjectMap[attempt.subject].push(percent);
     });
 
-    // Average score
+    // 2. Calculate average score (Overall Progress)
     const averageScore =
       totalQuestions > 0
         ? Math.round((totalScore / totalQuestions) * 100)
         : 0;
 
-    // Latest attempt
-    const latestAttempt = attempts.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    )[0];
-
-    const latestScore = latestAttempt
+    // 3. Get Latest attempt (Optimized DB query)
+    const latestAttempt = await Attempt.findOne({ user: userId }).sort({ createdAt: -1 });
+    const latestScoreString = latestAttempt
       ? `${latestAttempt.score}/${latestAttempt.totalQuestions}`
       : "0/0";
 
-    // Subject averages
+    // 4. Calculate Subject averages
     const subjectAnalytics = {};
-
     for (const subject in subjectMap) {
       const arr = subjectMap[subject];
-      const avg =
-        arr.reduce((sum, val) => sum + val, 0) / arr.length;
-
+      const avg = arr.reduce((sum, val) => sum + val, 0) / arr.length;
       subjectAnalytics[subject] = Math.round(avg);
     }
 
-    // Fake leaderboard rank (until ranking system built)
+    // 5. Fake leaderboard rank
     const leaderboardRank = Math.max(5000 - averageScore * 20, 1);
 
-    // Notifications
+    // 6. Get Notifications
     const notifications = await Notification.find({ user: userId })
       .sort({ createdAt: -1 })
       .limit(5);
 
+    // SUCCESS RESPONSE
     res.json({
       totalPractices,
-      averageScore,
-      latestScore,
+      overallProgress: averageScore, // Matches frontend
+      latestScore: latestScoreString,
       subjectAnalytics,
       leaderboardRank,
       notifications,
@@ -82,4 +73,4 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-module.exports = router;0
+module.exports = router;
