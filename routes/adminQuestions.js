@@ -3,8 +3,10 @@ const router = express.Router();
 const Question = require("../models/Question");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
-// 1. STUDENT PRACTICE ROUTE (Public/User)
-// This matches: GET /api/admin/practice?subject=bio
+/**
+ * @route   GET /api/admin/practice
+ * @desc    Public route for students to get questions by subject
+ */
 router.get("/practice", async (req, res) => {
   try {
     const { subject } = req.query;
@@ -12,31 +14,35 @@ router.get("/practice", async (req, res) => {
       return res.status(400).json({ message: "Subject is required" });
     }
 
-    // Find questions matching the subject (case-insensitive)
+    // Find 40 random questions for the subject (case-insensitive)
     const questions = await Question.find({ 
       subject: subject.toLowerCase() 
     }).limit(40);
 
-    // If no questions found, return empty array so frontend shows "No questions yet"
     res.json(questions);
   } catch (err) {
     console.error("Practice Fetch Error:", err);
-    res.status(500).json({ message: "Error fetching practice questions" });
+    res.status(500).json({ message: "Error fetching questions" });
   }
 });
 
-// 2. ADMIN: GET ALL QUESTIONS (For Dashboard Table)
-// This matches: GET /api/admin
+/**
+ * @route   GET /api/admin
+ * @desc    Admin only: Get all questions for the dashboard
+ */
 router.get("/", adminMiddleware, async (req, res) => {
   try {
     const questions = await Question.find().sort({ createdAt: -1 });
     res.json(questions);
   } catch (err) {
-    res.status(500).json({ message: "Error fetching questions" });
+    res.status(500).json({ message: "Error fetching admin list" });
   }
 });
 
-// 3. ADMIN: ADD NEW QUESTION
+/**
+ * @route   POST /api/admin
+ * @desc    Admin only: Add a new question
+ */
 router.post("/", adminMiddleware, async (req, res) => {
   try {
     const { subject, questionText, options, correctAnswer } = req.body;
@@ -47,13 +53,16 @@ router.post("/", adminMiddleware, async (req, res) => {
       correctAnswer
     });
     await question.save();
-    res.status(201).json({ message: "Question added successfully", question });
+    res.status(201).json({ message: "Question added", question });
   } catch (err) {
     res.status(400).json({ message: "Error saving question" });
   }
 });
 
-// 4. ADMIN: DELETE QUESTION
+/**
+ * @route   DELETE /api/admin/:id
+ * @desc    Admin only: Delete a question
+ */
 router.delete("/:id", adminMiddleware, async (req, res) => {
   try {
     await Question.findByIdAndDelete(req.params.id);
