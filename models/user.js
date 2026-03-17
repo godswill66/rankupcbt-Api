@@ -3,22 +3,20 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    // Set to false so you don't have to provide a full name for the admin account in Atlas
     required: false 
   },
 
-  // Added Username for your Admin Login
   username: {
     type: String,
     unique: true,
-    sparse: true // Allows this to be null for regular students
+    sparse: true 
   },
 
   email: {
     type: String,
-    required: false, // Changed from true to support admin-only accounts
+    required: false,
     unique: true,
-    sparse: true // Allows this to be null for the admin account
+    sparse: true 
   },
 
   password: {
@@ -32,16 +30,18 @@ const userSchema = new mongoose.Schema({
     default: "user"
   },
 
-  // ... keep your other fields (phone, location, etc.) as they were ...
-  phone: { type: String },
-  location: { type: String },
-  institution: { type: String },
-  bio: { type: String },
-  avatar: {
+  phone: { type: String, default: "" },
+  location: { type: String, default: "" },
+  institution: { type: String, default: "" },
+  bio: { type: String, default: "" },
+  
+  // FIXED: Changed 'avatar' to 'profilePicture' to match your routes and frontend
+  profilePicture: {
     type: String,
-    default: "/assets/default-avatar.png"
+    default: "https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg" // Or your local default path
   }
 
 }, { timestamps: true });
 
+// This logic prevents model overwrite errors in development
 module.exports = mongoose.models.User || mongoose.model("User", userSchema);
