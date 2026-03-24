@@ -26,8 +26,8 @@ const adminQuestions = require("./routes/adminQuestions");
 const adminUpload = require("./routes/adminUpload");
 const adminStats = require("./routes/adminStats");
 const examRoutes = require("./routes/exam");
+const resultRoutes = require("./routes/resultRoutes"); // 1. Add this import
 
-// 4. DEFINE ROUTES (API and Root first)
 
 // Root - This fixes the "Not Found" on your main URL
 app.get("/", (req, res) => {
@@ -46,6 +46,7 @@ app.use("/api/practice", require("./routes/practiceRoutes"));
 app.use("/api/ranking", require("./routes/rankingRoutes"));
 app.use("/api/answers", require("./routes/answerRoutes"));
 app.use("/api/exam", examRoutes);
+app.use("/api/results", resultRoutes);
 
 // Admin Routes
 app.use("/api/admin", adminQuestions);
