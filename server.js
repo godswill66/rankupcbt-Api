@@ -2,44 +2,63 @@ const express = require("express");
 const path = require("path"); 
 const dotenv = require("dotenv");
 const cors = require("cors");
+const helmet = require("helmet"); // Added for Security
 const connectDB = require("./config/db");
 
 dotenv.config();
 
 const app = express();
 
-// Connect Database
+// 1. DATABASE CONNECTION
 connectDB(process.env.MONGO_URI);
 
-// 2. MIDDLEWARE (Must come before routes)
+// 2. SECURITY MIDDLEWARE (Must come before routes)
+// Helmet adds headers that protect against common attacks and help clear Google warnings
+app.use(helmet({
+  contentSecurityPolicy: false, // Set to false if you have issues with external scripts
+}));
+
 app.use(
   cors({
     credentials: true,
-    origin: process.env.FRONTEND_URL,
-  }),
+    // Ensure your Render Environment Variable 'FRONTEND_URL' has NO trailing slash
+    // Example: https://rankupcbt.vercel.app
+    origin: process.env.FRONTEND_URL || "https://rankupcbt.vercel.app", 
+  })
 );
+
 app.use(express.json());
 
-// 3. IMPORT ROUTES
+// 3. LOGGING MIDDLEWARE (To see requests in Render logs)
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
+// 4. IMPORT ROUTES
 const profileRoutes = require("./routes/profileRoutes");
 const adminQuestions = require("./routes/adminQuestions");
 const adminUpload = require("./routes/adminUpload");
 const adminStats = require("./routes/adminStats");
 const examRoutes = require("./routes/exam");
-const resultRoutes = require("./routes/resultRoutes"); // 1. Add this import
+const resultRoutes = require("./routes/resultRoutes");
 
-
-// Root - This fixes the "Not Found" on your main URL
+// 5. OFFICIAL API ROUTES
+// Root Route - Proves to Google bots that this is a valid API
 app.get("/", (req, res) => {
-  res.send("RankUp CBT API Running 🚀");
+  res.status(200).json({ 
+    message: "RankUp CBT Official API", 
+    status: "online",
+    version: "1.0.0"
+  });
 });
 
-// User Routes
+// Auth & User Management
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/profile", profileRoutes);
 
-// CBT Routes
+// CBT & Student Routes
 app.use("/api/questions", require("./routes/questionRoutes"));
 app.use("/api/dashboard", require("./routes/dashboardRoutes"));
 app.use("/api/practice", require("./routes/practiceRoutes"));
@@ -48,20 +67,24 @@ app.use("/api/answers", require("./routes/answerRoutes"));
 app.use("/api/exam", examRoutes);
 app.use("/api/results", resultRoutes);
 
-// Admin Routes
+// Admin Management
 app.use("/api/admin", adminQuestions);
 app.use("/api/admin", adminUpload);
 app.use("/api/admin", adminStats);
 
-// 5. CATCH-ALL 404 (MUST BE THE VERY LAST ONE)
+// 6. CATCH-ALL 404 (MUST BE THE VERY LAST ONE)
 app.use((req, res) => {
-  // This points to your 404 folder and the 404.html file
+  // If it's a failed API call, return JSON instead of an HTML file
+  if (req.originalUrl.startsWith("/api")) {
+    return res.status(404).json({ error: "API endpoint not found" });
+  }
+  // Otherwise, show your custom 404 page
   res.status(404).sendFile(path.join(__dirname, "404", "404.html"));
 });
 
-// Server
+// 7. SERVER INITIALIZATION
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 RankUp Server deployed successfully on port ${PORT}`);
 });
