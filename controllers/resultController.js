@@ -56,7 +56,7 @@ exports.getLatestResult = async (req, res) => {
     // We find the one newest result for this specific student
     const result = await Result.findOne({ userId })
       .sort({ createdAt: -1 }) // -1 means "Newest First"
-      .populate("userId", "name email"); // Fills the ID with actual user details
+      .populate("userId", "fullName email"); // Fills the ID with actual user details
 
     if (!result) {
       return res.status(404).json({ message: "No results found for this user." });

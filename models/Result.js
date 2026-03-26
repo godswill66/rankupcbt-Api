@@ -53,7 +53,7 @@ exports.getLatestResult = async (req, res) => {
         // Find the most recent result for this specific user
         const result = await Result.findOne({ userId })
             .sort({ createdAt: -1 }) // -1 sorts by newest first
-            .populate('userId', 'name email'); // Optional: joins user details if needed
+            .populate('userId', 'fullName email'); // Optional: joins user details if needed
 
         if (!result) {
             return res.status(404).json({ 
