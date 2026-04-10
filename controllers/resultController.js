@@ -6,11 +6,13 @@ exports.saveResult = async (req, res) => {
   try {
     const { userId, scores } = req.body;
 
+    // Calculate Scores
     const totalEarned = scores.reduce((sum, s) => sum + s.score, 0);
     const totalPossible = scores.reduce((sum, s) => sum + s.total, 0);
     const overallScore =
       totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
 
+    // Ranking Logic
     const totalStudents = await Result.countDocuments();
     const higherScorers = await Result.countDocuments({
       overallScore: { $gt: overallScore },
