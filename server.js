@@ -42,6 +42,7 @@ const adminUpload = require("./routes/adminUpload");
 const adminStats = require("./routes/adminStats");
 const examRoutes = require("./routes/exam");
 const resultRoutes = require("./routes/resultRoutes");
+const userRoutes = require('./routes/userRoutes');
 
 // 5. OFFICIAL API ROUTES
 // Root Route - Proves to Google bots that this is a valid API
@@ -66,6 +67,7 @@ app.use("/api/ranking", require("./routes/rankingRoutes"));
 app.use("/api/answers", require("./routes/answerRoutes"));
 app.use("/api/exam", examRoutes);
 app.use("/api/results", resultRoutes);
+app.use('/api/users', userRoutes);
 
 // Admin Management
 app.use("/api/admin", adminQuestions);
