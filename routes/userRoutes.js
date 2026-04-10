@@ -9,6 +9,18 @@ router.get("/me", protect, async (req, res) => {
   res.json(req.user);
 });
 
+// 2. GET user by ID (REQUIRED FOR ANALYSIS PAGE)
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("fullName email profilePicture");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 // UPDATE profile (Text fields like Name, Bio, etc.)
 router.put("/profile", protect, async (req, res) => {
   try {
@@ -48,6 +60,7 @@ router.post("/upload-avatar", protect, upload.single('profileImage'), async (req
       message: "Image uploaded successfully!", 
       url: user.profilePicture 
     });
+    
   } catch (error) {
     console.error("Upload Error:", error);
     res.status(500).json({ message: "Upload failed" });
